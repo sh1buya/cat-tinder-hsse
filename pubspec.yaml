@@ -1,0 +1,47 @@
+name: cat_tinder_hsse
+description: "A new Flutter project."
+
+publish_to: 'none' # Remove this line if you wish to publish to pub.dev
+
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.7.2
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  cupertino_icons: ^1.0.8
+  http: ^1.2.0
+  cached_network_image: ^3.3.0
+  swipable_stack: ^2.0.0
+  google_fonts: ^6.1.0
+  animated_text_kit: ^4.2.2
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+  flutter_lints: ^5.0.0
+  flutter_launcher_icons: ^0.13.1
+
+flutter_launcher_icons:
+  android: true
+  ios: true
+  remove_alpha_ios: true  # <-- Добавьте эту строку
+  image_path: "assets/images/icon.png"
+  adaptive_icon_background: "#F5F5F5" # Фон для адаптивных иконок
+
+
+flutter:
+
+  uses-material-design: true
+  assets:
+    - assets/images/icon.png
+  fonts:
+    - family: Poppins
+      fonts:
+        - asset: assets/fonts/Roboto-Medium.ttf
+        - asset: assets/fonts/Roboto-Bold.ttf
+
