@@ -17,6 +17,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Cat? _currentCat;
   int _likesCount = 0;
   double _dragOffset = 0.0;
+  double _startDragX = 0.0;
   bool _isLoading = false;
 
   Future<void> _loadNewCat() async {
@@ -41,8 +42,19 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   void _handleSwipe(bool isLike) {
-    if (isLike) setState(() => _likesCount++);
-    _loadNewCat();
+    const animationDuration = Duration(milliseconds: 300);
+
+    setState(() {
+      _dragOffset = isLike ? 500 : -500;
+    });
+
+    Future.delayed(animationDuration, () {
+      if (isLike) setState(() => _likesCount++);
+      _loadNewCat();
+      if (mounted) {
+        setState(() => _dragOffset = 0);
+      }
+    });
   }
 
   @override
@@ -53,12 +65,25 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Widget _buildCatCard() {
     return GestureDetector(
-      onPanUpdate:
-          (details) =>
-              setState(() => _dragOffset = details.delta.dx.clamp(-100, 100)),
-      onPanEnd: (_) {
-        if (_dragOffset.abs() > 50) _handleSwipe(_dragOffset > 0);
-        setState(() => _dragOffset = 0);
+      onPanStart: (details) {
+        _startDragX = details.localPosition.dx;
+      },
+      onPanUpdate: (details) {
+        final currentX = details.localPosition.dx;
+        setState(() {
+          _dragOffset = currentX - _startDragX;
+        });
+      },
+      onPanEnd: (details) {
+        final threshold = MediaQuery.of(context).size.width * 0.2;
+        final velocityThreshold = MediaQuery.of(context).size.width * 0.5;
+
+        if (_dragOffset.abs() > threshold ||
+            details.velocity.pixelsPerSecond.dx.abs() > velocityThreshold) {
+          _handleSwipe(_dragOffset > 0);
+        } else {
+          setState(() => _dragOffset = 0);
+        }
       },
       onTap:
           () => Navigator.push(
@@ -175,39 +200,42 @@ class _HomeScreenState extends State<HomeScreen> {
       body:
           _isLoading || _currentCat == null
               ? const Center(child: CircularProgressIndicator())
-              : Column(
-                children: [
-                  Expanded(
-                    child: Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: AnimatedSwitcher(
-                        duration: const Duration(milliseconds: 300),
-                        child: _buildCatCard(),
+              : Listener(
+                behavior: HitTestBehavior.opaque,
+                child: Column(
+                  children: [
+                    Expanded(
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: AnimatedSwitcher(
+                          duration: const Duration(milliseconds: 300),
+                          child: _buildCatCard(),
+                        ),
                       ),
                     ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(
-                      vertical: 24,
-                      horizontal: 40,
+                    Padding(
+                      padding: const EdgeInsets.symmetric(
+                        vertical: 24,
+                        horizontal: 40,
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          ActionButton(
+                            icon: Icons.close,
+                            color: Colors.red,
+                            onPressed: () => _handleSwipe(false),
+                          ),
+                          ActionButton(
+                            icon: Icons.favorite,
+                            color: Colors.green,
+                            onPressed: () => _handleSwipe(true),
+                          ),
+                        ],
+                      ),
                     ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        ActionButton(
-                          icon: Icons.close,
-                          color: Colors.red,
-                          onPressed: () => _handleSwipe(false),
-                        ),
-                        ActionButton(
-                          icon: Icons.favorite,
-                          color: Colors.green,
-                          onPressed: () => _handleSwipe(true),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
+                  ],
+                ),
               ),
     );
   }

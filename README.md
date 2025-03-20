@@ -42,7 +42,7 @@
 
 ## 📥 Скачать APK
 
-[Последняя версия приложения](https://drive.google.com/file/d/107gRypWFHc66goXzovjCMODED0U_1nIV/view?usp=share_link)
+[Последняя версия приложения](https://drive.google.com/file/d/1W3_lJNll6fIBk_UKLRu2XvpAO32wp8VM/view?usp=share_link)
 
 ---
 
